@@ -1,84 +1,122 @@
-# - Importing Libraries
-import turtle as t
-import random as rnd
-wn = t.Screen()
+# imports
+import turtle as trtl
+import random as r
 
-#Create Game lists
+reset = trtl.Turtle()
+t = trtl.Turtle()
+t_two = trtl.Turtle()
+counter = trtl.Turtle()
+timekeeper = trtl.Turtle()
 
-gifs = ('candy.gif', 'candycorn.gif', 'ghost.gif', 'pumpkin.gif', 'witch.gif')
-poss_angles = (0, 45, 90, 135, 180, 225, 270, 315)
+# variables and other
+t.speed(10)
+t.penup()
+t_two.speed(10)
+t_two.penup()
+reset.penup()
 
-#Creating Game Functions
+score = 0
+font_setup = ("Arial", 20, "normal")
+timer = 30
+counter_interval = 1000   
+timer_up = False
+play = True
 
-def rand_coords():
-  xcor = rnd.randint(-200, 200)
-  ycor = rnd.randint(-200, 200)
-  return xcor, ycor
+# placing an image onto the turtles and other initial stuff
+wn = trtl.Screen()
 
-def pick_angle(poss_angles):
-  angle_index = rnd.randint(0, len(poss_angles) - 1)
-  angle = poss_angles[angle_index]
-  return angle
+wn.setup(892, 505)
 
-def choose_image(gifs):
-  gif_index = rnd.randint(0, len(gifs) - 1)
-  image = poss_angles[gif_index]
-  return image
+wn.bgpic('background.png')
 
-def change_pos(x, y):
-  t.penup()
-  t.goto(x, y)
-  t.pendown()
+fd_amount = [200, 100, 75, 50, 25, 10]
+angles = [0, 45, 90, 135, 180, 225, 270, 315]
+gifs = ["candy.gif", "ghost.gif", "pumpkin.gif", "witch_hat.gif", "bat.gif"]
 
-def increments(angle, x, y):
-  if angle == 0:
-    x += 1
-    y += 0
-  elif angle == 45:
-    x += 1
-    y += 1
-  elif angle == 90:
-    x += 0
-    y += 1
-  elif angle == 135:
-    x -= 1
-    y += 1
-  elif angle == 180:
-    x -= 1
-    y += 0
-  elif angle == 225:
-    x -= 1
-    y -= 1
-  elif angle == 270:
-    x += 0
-    y -= 1
-  elif angle == 315:
-    x += 1
-    y -= 1
-  
+image = r.choice(gifs)
+also_image = r.choice(gifs)
+wn.addshape(image)
+wn.addshape(also_image)
+t.shape(image)
+t_two.shape(also_image)
 
+# reset button
+reset.speed(0)
+reset.goto(400, 200)
+reset.color("red")
+reset.shape("circle")
+reset.shapesize(3)
 
-def move_gif(gifs, poss_angles):
-  image = choose_image(gifs)
-  wn.addshape(image)
-  gif = t.turtle(shape = image)
+# score writer
+counter.penup()
+counter.hideturtle()
+counter.goto(-400, 185)
 
-  angle = pick_angle(poss_angles)
-  
-  x, y = rand_coords()
-  change_pos(x, y)
+# time keeper
+timekeeper.penup()
+timekeeper.hideturtle()
+timekeeper.goto(-250, 185)
 
-  curr_xcor = t.xcor()
-  curr_ycor = t.ycor()
+# functions
+def move_one():
+    randX = r.randint(-200, 200) 
+    randY = r.randint(-200, 200) 
+    t.goto(randX, randY)
 
-  while -400 <= curr_xcor <= 400 and -400 <= curr_ycor <= 400:
-    curr_xcor = t.xcor()
-    curr_ycor = t.ycor()
-    t.setheading(angle)
-    t.stamp
-    increments(angle, x, y)
+def move_two():
+    randX = r.randint(-200, 200) 
+    randY = r.randint(-200, 200) 
+    t.goto(randX, randY)
+    t_two.goto(randX, randY)
 
-move_gif(gifs, poss_angles)
+def update_score_one(x,y):
+    global score 
+    global play
+    if play == True:
+        score += 1
+        counter.clear()
+        counter.write("Score: " + str(score),font=font_setup)
+        move_one()
 
+def update_score_two(x,y):
+    global score
+    global play
+    if play == True: 
+        score += 1
+        counter.clear()
+        counter.write("Score: " + str(score),font=font_setup)
+        move_two()
 
+def return_to_origin(x, y):
+    t.goto(0, 0)
+    t_two.goto(0, 0)
 
+def time_limit():
+  global timer, timer_up
+  global play
+  timekeeper.clear()
+  timekeeper.hideturtle()
+  if timer <= 0:
+    timekeeper.write("Time's Up", font=font_setup)
+    timer_up = True
+    play = False
+  else:
+    timekeeper.write("Timer: " + str(timer), font=font_setup)
+    timer -= 1
+    timekeeper.getscreen().ontimer(time_limit, counter_interval)
+
+# gameplay
+time_limit()
+while play == True:
+    t.setheading(r.choice(angles))
+    t_two.setheading(r.choice(angles))
+
+    t.fd(r.choice(fd_amount))
+    t_two.fd(r.choice(fd_amount))
+
+    t.onclick(update_score_one)
+    t_two.onclick(update_score_two)
+
+    reset.onclick(return_to_origin)
+
+wn.mainloop()
