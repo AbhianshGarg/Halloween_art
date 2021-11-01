@@ -116,7 +116,7 @@ for i in range(player_count):
 
 #Get player with highest score
 index = score_list.index(max(score_list)) + 1
-print('Player ' + str(index) + ' is the winner!')
+print('Player ' + str(index) + ' is the winner with a score of ' + str(score_list[index - 1]) + '!')
 
 
 
